@@ -1,18 +1,100 @@
 #include <Servo.h>
 
 Servo servo1;
+Servo servo2;
+Servo servo3;
+Servo servo4;
+
+//pin inputs for different tollerances
 const int buttonPin = 13;
+const int buttonPin1 = 12;
+const int buttonPin2 = 8;
+const int buttonPin3 = 7;
+const int buttonPin4 = 1;
+const int ledPin = 5;
+
+unsigned long timerVal;
+unsigned long currentTime;
+long timerLength = 1000;
+
+int countTol = 0;
+int interalCount1 = 0;
+int interalCount2 = 0;
 
 void setup() {
+  Serial.begin(9600);
 
   servo1.attach(3);
+  servo2.attach(6);
+  servo3.attach(9);
+  servo4.attach(11);
+
+  servo1.write(0);
+  servo2.write(90);
+  servo3.write(0);
+
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, LOW);
+
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(buttonPin1, INPUT_PULLUP);
+  pinMode(buttonPin2, INPUT_PULLUP);
+  pinMode(buttonPin3, INPUT_PULLUP);
+  pinMode(buttonPin4, INPUT_PULLUP);
 }
 
 void loop() {
-  if (digitalRead(buttonPin) == HIGH){
-    servo1.write(100);
-  } else {
-    servo1.write(90);
+  currentTime = millis();
+
+  if (digitalRead(buttonPin) == HIGH && countTol == 0){
+    servo1.write(180);
+    countTol += 1;
   }
- 
+  
+  if (digitalRead(buttonPin1) == HIGH && countTol == 1){ //Tollerance 1: Radiance
+    digitalWrite(ledPin, HIGH);
+    Serial.println("light");
+    countTol += 1;
+  }
+  
+  if (digitalRead(buttonPin2) == HIGH && countTol == 2){ //Tollerance 2: Hollow Knight Jump
+    Serial.println("running Rad");
+    timerVal = currentTime + timerLength;
+    servo2.write(103);
+    countTol += 1;
+    interalCount1 += 1;
+  } else if (currentTime >= timerVal && interalCount1 == 1) {
+    servo2.write(90);
+    timerVal = currentTime + timerLength * 10;
+    interalCount1 += 1;
+  } else if (currentTime >= timerVal && interalCount1 == 2) {
+    servo2.write(80);
+    timerVal = currentTime + timerLength;
+    interalCount1 += 1;
+  } else if (currentTime >= timerVal && interalCount1 == 3) {
+    servo2.write(90);
+  }
+
+  if (digitalRead(buttonPin3) == HIGH && countTol == 3){ //Tollerance 3: Hollow Knight Growth
+    servo3.write(180);
+    countTol += 1;
+  }
+
+  if (digitalRead(buttonPin4) == HIGH && countTol == 4{ //Tollerance 4: Hollow Knight Sealing
+    Serial.println("running HK");
+    timerVal = currentTime + timerLength;
+    servo4.write(103);
+    countTol += 1;
+    interalCount2 += 1;
+  } else if (currentTime >= timerVal && interalCount2 == 1) {
+    servo4.write(90);
+    timerVal = currentTime + timerLength;
+    interalCount2 += 1;
+  } else if (currentTime >= timerVal && interalCount2 == 2) {
+    servo4.write(80);
+    timerVal = currentTime + timerLength;
+    interalCount2 += 1;
+  } else if (currentTime >= timerVal && interalCount2 == 3) {
+    servo4.write(90);
+  }
 }
